@@ -112,7 +112,7 @@
 
     <div wire:loading.class="opacity-50" wire:target="date_from,date_to,setPeriode,resetFiltre">
 
-        {{-- ============ CARTES DE SYNTHÈSE ============ --}}
+
         <div class="row">
             <div class="col-md-4 col-sm-6">
                 <div class="info-box shadow-sm">
@@ -154,7 +154,7 @@
 
         @if($sections->isEmpty())
 
-            {{-- ============ ÉTAT VIDE ============ --}}
+
             <div class="card shadow-sm">
                 <div class="card-body text-center py-5">
                     <i class="far fa-folder-open fa-3x text-muted mb-3"></i>
@@ -168,7 +168,7 @@
 
         @else
 
-            {{-- ============ RÉSUMÉ PAR SECTION ============ --}}
+
             <div class="card shadow-sm">
                 <div class="card-header border-0">
                     <h3 class="card-title"><i class="fas fa-layer-group mr-1"></i> Élèves ayant payé par section</h3>
@@ -212,7 +212,6 @@
                 </div>
             </div>
 
-            {{-- ============ DÉTAIL PAR SECTION ============ --}}
             <div class="row">
                 @foreach($sections as $section)
                     <div class="col-lg-6">
