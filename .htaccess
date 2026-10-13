@@ -1,0 +1,10 @@
+<IfModule mod_rewrite.c>
+        Options -MultiViews -Indexes
+        RewriteEngine On
+        RewriteRule ^(.*)$ public/$1 [L]
+
+
+    # Handle Authorization Header
+
+</IfModule>
+X
