@@ -108,7 +108,6 @@ class RapportJournalierComponent extends Component
             ->join('classes as c', 'c.id', '=', 'i.classe_id')
             ->leftJoin('sections as s', 's.id', '=', 'c.section_id')
             ->join('frais as f', 'f.id', '=', 'p.frais_id')
-            ->leftJoin('sessions as se', 'se.id', '=', 'i.session_id')
             ->whereNull('p.deleted_at')
             ->where('p.annee_id', $annee_id)
             ->whereDate('p.created_at', '>=', $date_from)
@@ -116,26 +115,25 @@ class RapportJournalierComponent extends Component
 
         $lignes = (clone $base)
             ->selectRaw("
-                COALESCE(s.nom, 'Sans section') AS section,
-                COALESCE(se.nom, 'Sans session') AS session,
-                f.nom AS frais,
-                p.devise,
-                COUNT(DISTINCT i.eleve_id) AS nb_eleves,
-                SUM(p.montant) AS total
-            ")
-            ->groupBy('s.id', 's.nom', 'se.id', 'se.nom', 'f.id', 'f.nom', 'p.devise')
+            COALESCE(s.nom, 'Sans section') AS section,
+            'Toutes sessions' AS session,
+            f.nom AS frais,
+            p.devise,
+            COUNT(DISTINCT i.eleve_id) AS nb_eleves,
+            SUM(p.montant) AS total
+        ")
+            ->groupBy('s.id', 's.nom', 'f.id', 'f.nom', 'p.devise')
             ->orderBy('s.nom')
-            ->orderBy('se.nom')
             ->orderBy('f.nom')
             ->get();
 
         $effectifs = (clone $base)
             ->selectRaw("
-                COALESCE(s.nom, 'Sans section') AS section,
-                COALESCE(se.nom, 'Sans session') AS session,
-                COUNT(DISTINCT i.eleve_id) AS nb_eleves
-            ")
-            ->groupBy('s.id', 's.nom', 'se.id', 'se.nom')
+            COALESCE(s.nom, 'Sans section') AS section,
+            'Toutes sessions' AS session,
+            COUNT(DISTINCT i.eleve_id) AS nb_eleves
+        ")
+            ->groupBy('s.id', 's.nom')
             ->get()
             ->keyBy(fn ($row) => $row->section . '|' . $row->session);
 
@@ -176,7 +174,6 @@ class RapportJournalierComponent extends Component
             'date_to'      => $date_to,
         ];
     }
-
     public function render()
     {
         return view('livewire.finance.rapports.rapport-journalier-component', $this->getData());
