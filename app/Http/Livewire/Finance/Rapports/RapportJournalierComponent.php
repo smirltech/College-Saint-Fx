@@ -107,102 +107,102 @@ class RapportJournalierComponent extends Component
     }
 
 
-private function getPrintData(): array
-{
-    $base = DB::table('perceptions as p')
-        ->join('inscriptions as i', 'i.id', '=', 'p.inscription_id')
-        ->join('classes as c', 'c.id', '=', 'i.classe_id')
-        ->leftJoin('sections as s', 's.id', '=', 'c.section_id')
-        ->join('frais as f', 'f.id', '=', 'p.frais_id')
-        ->leftJoin('sessions as se', 'se.id', '=', 'i.session_id')
-        ->whereNull('p.deleted_at')
-        ->where('p.annee_id', $this->annee_id)
-        ->whereDate('p.created_at', '>=', $this->date_from)
-        ->whereDate('p.created_at', '<=', $this->date_to);
+    private function getPrintData(): array
+    {
+        $base = DB::table('perceptions as p')
+            ->join('inscriptions as i', 'i.id', '=', 'p.inscription_id')
+            ->join('classes as c', 'c.id', '=', 'i.classe_id')
+            ->leftJoin('sections as s', 's.id', '=', 'c.section_id')
+            ->join('frais as f', 'f.id', '=', 'p.frais_id')
+            ->leftJoin('sessions as se', 'se.id', '=', 'i.session_id')
+            ->whereNull('p.deleted_at')
+            ->where('p.annee_id', $this->annee_id)
+            ->whereDate('p.created_at', '>=', $this->date_from)
+            ->whereDate('p.created_at', '<=', $this->date_to);
 
 
-    $lignes = (clone $base)
-        ->selectRaw("
-            COALESCE(s.nom, 'Sans section') AS section,
-            COALESCE(se.nom, 'Sans session') AS session,
-            f.nom AS frais,
-            p.devise,
-            COUNT(DISTINCT i.eleve_id) AS nb_eleves,
-            SUM(p.montant) AS total
-        ")
-        ->groupBy(
-            's.id',
-            's.nom',
-            'se.id',
-            'se.nom',
-            'f.id',
-            'f.nom',
-            'p.devise'
-        )
-        ->orderBy('s.nom')
-        ->orderBy('se.nom')
-        ->orderBy('f.nom')
-        ->get();
+        $lignes = (clone $base)
+            ->selectRaw("
+                COALESCE(s.nom, 'Sans section') AS section,
+                COALESCE(se.nom, 'Sans session') AS session,
+                f.nom AS frais,
+                p.devise,
+                COUNT(DISTINCT i.eleve_id) AS nb_eleves,
+                SUM(p.montant) AS total
+            ")
+            ->groupBy(
+                's.id',
+                's.nom',
+                'se.id',
+                'se.nom',
+                'f.id',
+                'f.nom',
+                'p.devise'
+            )
+            ->orderBy('s.nom')
+            ->orderBy('se.nom')
+            ->orderBy('f.nom')
+            ->get();
 
 
-    $effectifs = (clone $base)
-        ->selectRaw("
-            COALESCE(s.nom, 'Sans section') AS section,
-            COALESCE(se.nom, 'Sans session') AS session,
-            COUNT(DISTINCT i.eleve_id) AS nb_eleves
-        ")
-        ->groupBy('s.id', 's.nom', 'se.id', 'se.nom')
-        ->get()
-        ->keyBy(fn ($row) => $row->section . '|' . $row->session);
+        $effectifs = (clone $base)
+            ->selectRaw("
+                COALESCE(s.nom, 'Sans section') AS section,
+                COALESCE(se.nom, 'Sans session') AS session,
+                COUNT(DISTINCT i.eleve_id) AS nb_eleves
+            ")
+            ->groupBy('s.id', 's.nom', 'se.id', 'se.nom')
+            ->get()
+            ->keyBy(fn ($row) => $row->section . '|' . $row->session);
 
-    // Organisation des données : section > session > frais
-    $sections = $lignes
-        ->groupBy('section')
-        ->map(function ($lignesSection, $nomSection) use ($effectifs) {
-            $sessions = $lignesSection
-                ->groupBy('session')
-                ->map(function ($lignesSession, $nomSession) use (
-                    $effectifs,
-                    $nomSection
-                ) {
-                    $cle = $nomSection . '|' . $nomSession;
-                    $effectif = $effectifs->get($cle);
 
-                    return (object) [
-                        'nom' => $nomSession,
-                        'nb_eleves' => $effectif?->nb_eleves ?? 0,
-                        'lignes' => $lignesSession->values(),
-                        'totaux' => $lignesSession
-                            ->groupBy('devise')
-                            ->map(fn ($g) => $g->sum('total')),
-                    ];
-                })
-                ->values();
+        $sections = $lignes
+            ->groupBy('section')
+            ->map(function ($lignesSection, $nomSection) use ($effectifs) {
+                $sessions = $lignesSection
+                    ->groupBy('session')
+                    ->map(function ($lignesSession, $nomSession) use (
+                        $effectifs,
+                        $nomSection
+                    ) {
+                        $cle = $nomSection . '|' . $nomSession;
+                        $effectif = $effectifs->get($cle);
 
-            return (object) [
-                'nom' => $nomSection,
-                'sessions' => $sessions,
-                'totaux' => $lignesSection
-                    ->groupBy('devise')
-                    ->map(fn ($g) => $g->sum('total')),
-            ];
-        })
-        ->values();
+                        return (object) [
+                            'nom' => $nomSession,
+                            'nb_eleves' => $effectif?->nb_eleves ?? 0,
+                            'lignes' => $lignesSession->values(),
+                            'totaux' => $lignesSession
+                                ->groupBy('devise')
+                                ->map(fn ($g) => $g->sum('total')),
+                        ];
+                    })
+                    ->values();
 
-    return [
-        'sections' => $sections,
-        'totalGeneral' => $lignes
-            ->groupBy('devise')
-            ->map(fn ($g) => $g->sum('total')),
-        'totalEleves' => (clone $base)
-            ->distinct()
-            ->count('i.eleve_id'),
-        'date_from' => $this->date_from,
-        'date_to' => $this->date_to,
-    ];
-}
+                return (object) [
+                    'nom' => $nomSection,
+                    'sessions' => $sessions,
+                    'totaux' => $lignesSection
+                        ->groupBy('devise')
+                        ->map(fn ($g) => $g->sum('total')),
+                ];
+            })
+            ->values();
 
-public function printIt()
+        return [
+            'sections' => $sections,
+            'totalGeneral' => $lignes
+                ->groupBy('devise')
+                ->map(fn ($g) => $g->sum('total')),
+            'totalEleves' => (clone $base)
+                ->distinct()
+                ->count('i.eleve_id'),
+            'date_from' => $this->date_from,
+            'date_to' => $this->date_to,
+        ];
+    }
+
+    public function printIt()
 {
     $data = $this->getPrintData();
 
