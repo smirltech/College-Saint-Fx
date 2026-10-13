@@ -1,0 +1,40 @@
+{
+    "name": "smirltech/laravel-fullcalendar",
+    "description": "Laravel 10 helper for FullCalendar.io",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Shawn Tunney",
+            "email": "shawn.tunney@gmail.com"
+        },
+        {
+            "name": "Marien Mupenda",
+            "email": "marien@smirltech.com"
+        }
+    ],
+    "require": {
+        "php": "^8.0",
+        "illuminate/support": "^10.0|^9.0|^8.0"
+    },
+    "autoload": {
+        "psr-0": {
+            "SmirlTech\\LaravelFullcalendar": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "SmirlTech\\LaravelFullcalendar\\ServiceProvider"
+            ],
+            "aliases": {
+                "Calendar": "SmirlTech\\LaravelFullcalendar\\Facades\\Calendar"
+            }
+        }
+    },
+    "minimum-stability": "stable",
+    "config": {
+        "allow-plugins": {
+            "kylekatarnls/update-helper": true
+        }
+    }
+}

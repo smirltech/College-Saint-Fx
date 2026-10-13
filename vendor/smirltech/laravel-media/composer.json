@@ -1,0 +1,68 @@
+{
+    "name": "smirltech/laravel-media",
+    "description": "Associate files to with eloquent models",
+    "keywords": [
+        "SmirlTech",
+        "laravel",
+        "laravel-media"
+    ],
+    "homepage": "https://github.com/smirltech/laravel-media",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Marien Mupenda",
+            "email": "marien@smirltech.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^8.0",
+        "illuminate/contracts": "^10.0|^9.0|^8.0",
+        "intervention/image": "^2.7",
+        "livewire/livewire": "^2.10",
+        "smirltech/laravel-form": "*",
+        "spatie/laravel-package-tools": "^1.14"
+    },
+    "require-dev": {
+        "laravel/pint": "^1.0",
+        "nunomaduro/collision": "^6.0",
+        "orchestra/testbench": "^8.0",
+        "phpunit/phpunit": "^9.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "SmirlTech\\LaravelMedia\\": "src",
+            "SmirlTech\\LaravelMedia\\Database\\Factories\\": "database/factories"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "SmirlTech\\LaravelMedia\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": "@php ./vendor/bin/testbench package:discover --ansi",
+        "analyse": "vendor/bin/phpstan analyse",
+        "test-coverage": "vendor/bin/pest --coverage",
+        "format": "vendor/bin/pint"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "phpstan/extension-installer": true
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "SmirlTech\\LaravelMedia\\LaravelMediaServiceProvider"
+            ],
+            "aliases": {
+                "LaravelMedia": "SmirlTech\\LaravelMedia\\Facades\\LaravelMedia"
+            }
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

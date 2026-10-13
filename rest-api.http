@@ -1,0 +1,59 @@
+### Eleves
+GET {{base_url}}/api/eleves
+Accept: application/json
+
+<> 2022-10-22T215435.200.json
+
+### Eleve
+GET {{base_url}}/api/eleves/10
+Accept: application/json
+
+<> 2022-10-23T063000.200.json
+<> 2022-10-22T220008.200.json
+<> 2022-10-22T215547.200.json
+
+### Eleve inscriptions
+GET {{base_url}}/api/inscriptions
+Accept: application/json
+
+<> 2022-10-22T220030.200.json
+<> 2022-10-22T215945.200.json
+<> 2022-10-22T215833.200.json
+<> 2022-10-22T215755.500.json
+<> 2022-10-22T215702.500.json
+<> 2022-10-22T215609.500.json
+
+
+### Eleve inscriptions
+GET {{base_url}}/api/eleves/10/responsables
+Accept: application/json
+
+<> 2022-10-22T220221.404.json
+
+### Annees
+GET {{base_url}}/api/annees
+Accept: application/json
+
+### Search inscriptions
+POST {{base_url}}/api/inscriptions/search
+Accept: application/json
+Content-Type: application/json
+
+{
+    "scopes": [
+        {
+            "name": "annee",
+            "parameters": [
+                "1"
+            ]
+        },
+        {
+            "name": "classe",
+            "parameters": [
+                "1"
+            ]
+        }
+    ]
+}
+
+

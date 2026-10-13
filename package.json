@@ -1,0 +1,34 @@
+{
+    "private": true,
+    "scripts": {
+        "dev": "vite",
+        "prod": "vite build"
+    },
+    "devDependencies": {
+        "@popperjs/core": "^2.11.6",
+        "alpinejs": "^3.10.5",
+        "autoprefixer": "^10.4.2",
+        "axios": "^0.27",
+        "bootstrap": "^5.2.3",
+        "browser-sync": "^2.27.11",
+        "browser-sync-webpack-plugin": "^2.3.0",
+        "laravel-vite-plugin": "^0.7.7",
+        "lodash": "^4.17.19",
+        "postcss": "^8.4.6",
+        "resolve-url-loader": "^5.0.0",
+        "sass": "^1.32.11",
+        "sass-loader": "^12.1.0",
+        "vite": "^4.3.6"
+    },
+    "dependencies": {
+        "@fortawesome/fontawesome": "^1.1.8",
+        "@fortawesome/fontawesome-free": "^6.2.0",
+        "@fullcalendar/core": "^6.0.2",
+        "apexcharts": "^3.39.0",
+        "chart.js": "^3.9.1",
+        "fullcalendar": "^6.0.2",
+        "popper": "^1.0.1",
+        "print-js": "^1.6.0",
+        "sweetalert2": "^11.7.1"
+    }
+}
