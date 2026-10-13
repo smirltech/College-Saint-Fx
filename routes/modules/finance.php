@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\RapportJournalierPdfController;
 use App\Http\Livewire\Finance;
 use App\Http\Livewire\Finance\Rapports\RapportsMinervalsComponent;
 use Illuminate\Support\Facades\Route;
@@ -46,5 +47,8 @@ Route::prefix('finance')->middleware(['auth:web'])->as('finance.')->group(functi
 
     Route::get('journalier', Finance\Rapports\RapportJournalierComponent::class)
         ->name('rapports.journalier');
+
+    Route::get('journalier/pdf', \App\Http\Controllers\RapportJournalierPdfController::class)
+        ->name('rapports.journalier.pdf');
 });
 

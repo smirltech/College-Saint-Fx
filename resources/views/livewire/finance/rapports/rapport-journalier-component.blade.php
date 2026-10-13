@@ -83,11 +83,15 @@
                     <button type="button" wire:click="resetFiltre" class="btn btn-sm btn-light border" title="Réinitialiser">
                         <i class="fas fa-undo"></i>
                     </button>
-                    <button type="button" wire:click="printIt" wire:loading.attr="disabled" wire:target="printIt"
-                            class="btn btn-sm btn-danger">
-                        <span wire:loading.remove wire:target="printIt"><i class="fa fa-file-pdf"></i> PDF</span>
-                        <span wire:loading wire:target="printIt"><i class="fas fa-spinner fa-spin"></i></span>
-                    </button>
+
+                    <a href="{{ route('finance.rapports.journalier.pdf', [
+            'date_from' => $date_from,
+            'date_to'   => $date_to,
+            'annee_id'  => $annee_id,
+        ]) }}"
+                       class="btn btn-sm btn-danger">
+                        <i class="fa fa-file-pdf"></i> PDF
+                    </a>
                 </div>
             </div>
         </div>

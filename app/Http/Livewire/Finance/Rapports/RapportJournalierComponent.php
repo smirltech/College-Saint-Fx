@@ -2,11 +2,9 @@
 
 namespace App\Http\Livewire\Finance\Rapports;
 
-use App\Models\Annee;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class RapportJournalierComponent extends Component
 {
@@ -43,10 +41,8 @@ class RapportJournalierComponent extends Component
             ->join('frais as f', 'f.id', '=', 'p.frais_id')
             ->whereNull('p.deleted_at')
             ->where('p.annee_id', $this->annee_id)
-
             ->whereDate('p.created_at', '>=', $this->date_from)
             ->whereDate('p.created_at', '<=', $this->date_to);
-
 
         $totauxSections = (clone $base)
             ->selectRaw("COALESCE(s.nom, 'Sans section') AS section,
@@ -55,7 +51,6 @@ class RapportJournalierComponent extends Component
             ->orderBy('s.nom')
             ->get()
             ->keyBy('section');
-
 
         $details = (clone $base)
             ->selectRaw("COALESCE(s.nom, 'Sans section') AS section,
@@ -75,11 +70,11 @@ class RapportJournalierComponent extends Component
                 'nom'       => $nom,
                 'nb_eleves' => $row->nb_eleves,
                 'lignes'    => $lignes,
-                'totaux'    => $lignes->groupBy('devise')->map(fn($g) => $g->sum('total')),
+                'totaux'    => $lignes->groupBy('devise')->map(fn ($g) => $g->sum('total')),
             ];
         })->values();
 
-        $totalGeneral = $sections->flatMap->lignes->groupBy('devise')->map(fn($g) => $g->sum('total'));
+        $totalGeneral = $sections->flatMap->lignes->groupBy('devise')->map(fn ($g) => $g->sum('total'));
         $totalEleves  = (clone $base)->distinct()->count('i.eleve_id');
 
         return [
@@ -106,8 +101,7 @@ class RapportJournalierComponent extends Component
         $this->setPeriode('today');
     }
 
-
-    private function getPrintData(): array
+    public static function buildPrintData($annee_id, $date_from, $date_to): array
     {
         $base = DB::table('perceptions as p')
             ->join('inscriptions as i', 'i.id', '=', 'p.inscription_id')
@@ -116,10 +110,9 @@ class RapportJournalierComponent extends Component
             ->join('frais as f', 'f.id', '=', 'p.frais_id')
             ->leftJoin('sessions as se', 'se.id', '=', 'i.session_id')
             ->whereNull('p.deleted_at')
-            ->where('p.annee_id', $this->annee_id)
-            ->whereDate('p.created_at', '>=', $this->date_from)
-            ->whereDate('p.created_at', '<=', $this->date_to);
-
+            ->where('p.annee_id', $annee_id)
+            ->whereDate('p.created_at', '>=', $date_from)
+            ->whereDate('p.created_at', '<=', $date_to);
 
         $lignes = (clone $base)
             ->selectRaw("
@@ -130,20 +123,11 @@ class RapportJournalierComponent extends Component
                 COUNT(DISTINCT i.eleve_id) AS nb_eleves,
                 SUM(p.montant) AS total
             ")
-            ->groupBy(
-                's.id',
-                's.nom',
-                'se.id',
-                'se.nom',
-                'f.id',
-                'f.nom',
-                'p.devise'
-            )
+            ->groupBy('s.id', 's.nom', 'se.id', 'se.nom', 'f.id', 'f.nom', 'p.devise')
             ->orderBy('s.nom')
             ->orderBy('se.nom')
             ->orderBy('f.nom')
             ->get();
-
 
         $effectifs = (clone $base)
             ->selectRaw("
@@ -155,24 +139,19 @@ class RapportJournalierComponent extends Component
             ->get()
             ->keyBy(fn ($row) => $row->section . '|' . $row->session);
 
-
         $sections = $lignes
             ->groupBy('section')
             ->map(function ($lignesSection, $nomSection) use ($effectifs) {
                 $sessions = $lignesSection
                     ->groupBy('session')
-                    ->map(function ($lignesSession, $nomSession) use (
-                        $effectifs,
-                        $nomSection
-                    ) {
-                        $cle = $nomSection . '|' . $nomSession;
-                        $effectif = $effectifs->get($cle);
+                    ->map(function ($lignesSession, $nomSession) use ($effectifs, $nomSection) {
+                        $effectif = $effectifs->get($nomSection . '|' . $nomSession);
 
                         return (object) [
-                            'nom' => $nomSession,
+                            'nom'       => $nomSession,
                             'nb_eleves' => $effectif?->nb_eleves ?? 0,
-                            'lignes' => $lignesSession->values(),
-                            'totaux' => $lignesSession
+                            'lignes'    => $lignesSession->values(),
+                            'totaux'    => $lignesSession
                                 ->groupBy('devise')
                                 ->map(fn ($g) => $g->sum('total')),
                         ];
@@ -180,9 +159,9 @@ class RapportJournalierComponent extends Component
                     ->values();
 
                 return (object) [
-                    'nom' => $nomSection,
+                    'nom'      => $nomSection,
                     'sessions' => $sessions,
-                    'totaux' => $lignesSection
+                    'totaux'   => $lignesSection
                         ->groupBy('devise')
                         ->map(fn ($g) => $g->sum('total')),
                 ];
@@ -190,33 +169,13 @@ class RapportJournalierComponent extends Component
             ->values();
 
         return [
-            'sections' => $sections,
-            'totalGeneral' => $lignes
-                ->groupBy('devise')
-                ->map(fn ($g) => $g->sum('total')),
-            'totalEleves' => (clone $base)
-                ->distinct()
-                ->count('i.eleve_id'),
-            'date_from' => $this->date_from,
-            'date_to' => $this->date_to,
+            'sections'     => $sections,
+            'totalGeneral' => $lignes->groupBy('devise')->map(fn ($g) => $g->sum('total')),
+            'totalEleves'  => (clone $base)->distinct()->count('i.eleve_id'),
+            'date_from'    => $date_from,
+            'date_to'      => $date_to,
         ];
     }
-
-    public function printIt()
-{
-    $data = $this->getPrintData();
-
-    $pdf = Pdf::loadView(
-        'livewire.finance.rapports.modals.printablejournalier',
-        $data
-    )->setPaper('a4', 'landscape');
-
-    return response()->streamDownload(
-        fn () => print($pdf->output()),
-        "rapport-journalier-{$this->date_from}-{$this->date_to}.pdf"
-    );
-}
-
 
     public function render()
     {
