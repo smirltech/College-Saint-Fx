@@ -31,31 +31,30 @@
                     return $data;
                 }
             } catch (\Throwable $e) {
-                // Utiliser le dernier taux connu si l'API échoue.
+
             }
 
             return null;
         }
     );
 
-    // Utiliser le dernier taux connu en cas d'indisponibilité de l'API.
+
     $exchange = $exchange ?? Cache::get('usd_cdf_rate_last');
 
-    // Valeur de secours si aucun taux n'est disponible.
+
     $autoRate = $exchange['rate'] ?? 2850.00;
 
-    // Préremplir le taux quand on paie en CDF et que le champ est vide.
+
     if ($perception->devise == Devise::CDF && empty($perception->taux)) {
         $perception->taux = $autoRate;
     }
 @endphp
 
 <x-modals::form title="Perception de {{ $inscription->eleve->nom }}">
-    {{-- <x-form::validation-errors/> --}}
 
     <div class="row mb-3">
 
-        {{-- Sélection des frais --}}
+
         <div class="col-md-12 mb-3">
             <x-form::select
                     label="Frais"
@@ -72,7 +71,7 @@
             </x-form::select>
         </div>
 
-        {{-- Sélection du mois --}}
+
         @if ($fee?->type?->properties())
             <div class="col-md-12 mb-3">
                 <x-form::select
@@ -86,7 +85,7 @@
             </div>
         @endif
 
-        {{-- Montant à payer --}}
+
         <div class="col-md-12 mb-3">
             <x-form::input
                     label="Montant à Payer - {{ $fee?->devise }}"
@@ -96,7 +95,7 @@
             />
         </div>
 
-        {{-- Devise de paiement --}}
+
         <div class="col-md-12 mb-3">
             <x-form::select
                     change
@@ -106,7 +105,7 @@
             />
         </div>
 
-        {{-- Taux du jour : prérempli automatiquement, modifiable --}}
+
         @if ($perception->devise == Devise::CDF)
             <div class="col-md-12 mb-3">
                 <x-form::input
@@ -125,7 +124,7 @@
             </div>
         @endif
 
-        {{-- Montant payé --}}
+
         <div class="col-md-12 mb-3">
             <x-form::input
                     label="Montant Payé"
