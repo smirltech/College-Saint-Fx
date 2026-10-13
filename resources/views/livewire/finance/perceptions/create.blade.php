@@ -5,7 +5,7 @@
     use Illuminate\Support\Facades\Cache;
     use Illuminate\Support\Facades\Http;
 
-    // Récupérer le taux USD/CDF et le conserver pendant 12 heures.
+
     $exchange = Cache::remember(
         'usd_cdf_rate',
         now()->addHours(12),
