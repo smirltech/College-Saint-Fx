@@ -25,12 +25,12 @@
 
 <div class="container-fluid">
 
-    {{-- ============ BARRE DE FILTRE ============ --}}
+
     <div class="card card-outline card-primary shadow-sm">
         <div class="card-body py-3">
             <div class="row align-items-end">
 
-                {{-- Raccourcis --}}
+
                 <div class="col-lg-5 mb-2 mb-lg-0">
                     <label class="small text-muted mb-1 d-block">Période rapide</label>
                     <div class="btn-group btn-group-sm" role="group">
@@ -93,7 +93,7 @@
         </div>
     </div>
 
-    {{-- Titre de la période + indicateur de chargement --}}
+
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h5 class="mb-0 text-secondary">
             <i class="fas fa-chart-line mr-1"></i>
@@ -102,7 +102,7 @@
             @else
                 Rapport du <strong>{{ $debut->translatedFormat('d F Y') }}</strong>
                 au <strong>{{ $fin->translatedFormat('d F Y') }}</strong>
-                <span class="badge badge-light border ml-1">{{ $debut->diffInDays($fin) + 1 }} jours</span>
+                <span class="text-black ml-1">{{ $debut->diffInDays($fin) + 1 }} jours</span>
             @endif
         </h5>
         <span wire:loading wire:target="date_from,date_to,setPeriode,resetFiltre" class="text-muted small">
