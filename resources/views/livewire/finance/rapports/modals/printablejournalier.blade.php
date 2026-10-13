@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -18,21 +17,34 @@
             color: #222;
         }
 
-        .header {
-            text-align: center;
+        .header-table {
+            width: 100%;
+            border-collapse: collapse;
             border-bottom: 2px solid #333;
-            padding-bottom: 10px;
             margin-bottom: 15px;
         }
 
-        .header h2 {
+        .header-table td {
+            vertical-align: middle;
+            padding-bottom: 10px;
+        }
+
+        .header-text {
+            text-align: center;
+        }
+
+        .header-text h2 {
             margin: 0 0 5px;
             font-size: 18px;
             text-transform: uppercase;
         }
 
-        .header p {
+        .header-text p {
             margin: 4px 0;
+        }
+
+        .header-logo {
+            height: 70px;
         }
 
         .summary {
@@ -115,17 +127,45 @@
 
 <body>
 
-<div class="header">
-    <h2>Collège Saint François Xavier</h2>
-    <p><strong>RAPPORT JOURNALIER DES PAIEMENTS</strong></p>
-    <p>
-        Période :
-        {{ \Carbon\Carbon::parse($date_from)->format('d/m/Y') }}
-        au
-        {{ \Carbon\Carbon::parse($date_to)->format('d/m/Y') }}
-    </p>
-    <p>Document généré le {{ now()->format('d/m/Y à H:i') }}</p>
-</div>
+@php
+    // Logo en base64 pour que DomPDF l'affiche à coup sûr.
+    $logoPath   = public_path('images/logo.png');
+    $logoBase64 = file_exists($logoPath)
+        ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath))
+        : null;
+
+    // Utilisateur qui génère le rapport.
+    $auteur = auth()->user();
+    $auteurNom = $auteur->name ?? $auteur->nom ?? $auteur->email ?? 'Utilisateur inconnu';
+@endphp
+
+<table class="header-table">
+    <tr>
+        <td style="width: 90px;">
+            @if ($logoBase64)
+                <img src="{{ $logoBase64 }}" class="header-logo" alt="Logo">
+            @endif
+        </td>
+
+        <td class="header-text">
+            <h2>Collège Saint François Xavier</h2>
+            <p><strong>RAPPORT JOURNALIER DES PAIEMENTS</strong></p>
+            <p>
+                Période :
+                {{ \Carbon\Carbon::parse($date_from)->format('d/m/Y') }}
+                au
+                {{ \Carbon\Carbon::parse($date_to)->format('d/m/Y') }}
+            </p>
+            <p>
+                Document généré le {{ now()->format('d/m/Y à H:i') }}
+                par <strong>{{ $auteurNom }}</strong>
+            </p>
+        </td>
+
+        {{-- Colonne vide pour garder le texte bien centré --}}
+        <td style="width: 90px;"></td>
+    </tr>
+</table>
 
 {{-- RÉSUMÉ GÉNÉRAL --}}
 <table class="summary">
@@ -268,6 +308,7 @@
 
 <div class="footer">
     Collège Saint François Xavier — Rapport financier
+    — Généré par {{ $auteurNom }}
 </div>
 
 </body>
