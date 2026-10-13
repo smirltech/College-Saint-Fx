@@ -162,7 +162,7 @@
             </p>
         </td>
 
-        {{-- Colonne vide pour garder le texte bien centré --}}
+
         <td style="width: 90px;"></td>
     </tr>
 </table>
@@ -209,9 +209,9 @@
 
     @forelse($section->sessions as $session)
 
-        {{-- SESSION --}}
+
         <div class="session-title">
-            Session : {{ $session->nom }}
+            Section : {{ $session->nom }}
             — {{ $session->nb_eleves }} élève(s) ayant payé
         </div>
 
@@ -251,7 +251,7 @@
             @foreach($session->totaux as $devise => $total)
                 <tr class="total-row">
                     <td colspan="4" class="right">
-                        TOTAL SESSION EN {{ $devise }}
+                        TOTAL SECTION EN {{ $devise }}
                     </td>
                     <td class="right">
                         {{ number_format($total, 2, ',', ' ') }}
@@ -263,7 +263,7 @@
         </table>
 
     @empty
-        <p class="muted">Aucune session pour cette section.</p>
+        <p class="muted">Aucune section pour cette section.</p>
     @endforelse
 
 @empty

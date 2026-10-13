@@ -116,7 +116,7 @@ class RapportJournalierComponent extends Component
         $lignes = (clone $base)
             ->selectRaw("
             COALESCE(s.nom, 'Sans section') AS section,
-            'Toutes sessions' AS session,
+            'Toutes sections' AS session,
             f.nom AS frais,
             p.devise,
             COUNT(DISTINCT i.eleve_id) AS nb_eleves,
@@ -130,7 +130,7 @@ class RapportJournalierComponent extends Component
         $effectifs = (clone $base)
             ->selectRaw("
             COALESCE(s.nom, 'Sans section') AS section,
-            'Toutes sessions' AS session,
+            'Toutes sections' AS session,
             COUNT(DISTINCT i.eleve_id) AS nb_eleves
         ")
             ->groupBy('s.id', 's.nom')
