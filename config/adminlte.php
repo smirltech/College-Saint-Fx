@@ -392,6 +392,7 @@ return [
                     'url' => 'finance/rapports',
 
                 ],
+
                 [
                     'text' => 'Journalier',
                     'url' => 'finance/journalier',
